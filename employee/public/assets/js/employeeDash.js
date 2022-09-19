@@ -19,7 +19,7 @@
 				var response = res.message
 				
 				if (response["relocate"]){
-					alert(response["relocation_url"])
+					
 					window.location.href = response["relocation_url"];	
 				}
 			}	
@@ -75,6 +75,27 @@
 		makecall();
 
 	}
+	
+	// document.getElementById("logout_link").addEventListener("click", function(e){
+		
+	// 	var myObj={"status":"logout"};
+	// 	let makecall = async()=>{
+	// 		// post to API
+			
+	// 			res = await $.ajax({
+	// 				url: '/api/method/employee.api.logout',
+	// 				method: 'POST',
+	// 				data:myObj,
+	// 				headers: {
+	// 					'X-Frappe-CSRF-Token': frappe.csrf_token
+	// 				},
+	// 			});
+	// 			var message = res.message
+	// 		}	
+	// 	makecall();
+		
+		
+	// });
 
 	document.getElementById("punch_attendance").addEventListener("submit", function(e){
 		

@@ -9,6 +9,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Employee Dashboard - HRMS admin template</title>
 
+
 <link rel="shortcut icon" type="image/x-icon" href="/assets/employee/assets/img/favicon.png">
 
 <link rel="stylesheet" href="/assets/employee/assets/css/bootstrap.min.css">
@@ -47,12 +48,36 @@
 	display_c();
 	 }
 	</script>
+
+	<script type="text/javascript">
+		function check_permission(){
+			let makecall = async()=>{
+				// post to API
+				
+					res = await $.ajax({
+						url: '/api/method/employee.api.check_permission',
+						method: 'POST',
+						headers: {
+							'X-Frappe-CSRF-Token': frappe.csrf_token
+						},
+					});
+					var response = res.message
+					
+					if (response["relocate"]){
+						
+						window.location.href = response["relocation_url"];	
+					}
+				}	
+			makecall();
+		}
+		check_permission();
+	</script>
 	
 
 	
 </head>
 <body onload=display_ct();>
-
+	
 <div class="main-wrapper">
 
 <div id="loader-wrapper">
@@ -314,13 +339,15 @@
 </div>
 </div>
 </li>
+<a href="/?cmd=web_logout" class="btn btn-success"> Logout</a>
+</a>
 
 <li class="nav-item dropdown has-arrow main-drop">
 <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
 <span class="user-img"><img src="/assets/employee/assets/img/profiles/avatar-21.jpg" alt="">
 <span class="status online"></span></span>
 <span>Admin</span>
-</a>
+
 <div class="dropdown-menu">
 <a class="dropdown-item" href="profile.html">My Profile</a>
 <a class="dropdown-item" href="settings.html">Settings</a>
@@ -968,8 +995,6 @@
 				<div class="card-body">
 				  <h5 class="card-title">
 					<span class="text-success text-center font-size: 30px" id="current_time3" ></span>
-					
-					
 				  </h5>
 				  <div class="punch-det">
 					<h6>Attendance filled</h6>
@@ -1105,8 +1130,8 @@
 	colors: ['#FFFFFF','#FFFFFF', '#ff0000', '#FFFF00', '#00FF00'],
 	});
  </script>
+ 
 
-id="chart"
 
 <script src="/assets/employee/assets/js/jquery-3.5.1.min.js"></script>
 
@@ -1138,11 +1163,12 @@ id="chart"
 	<script type="text/javascript" src="/assets/frappe/dist/js/report.bundle.CXAPNF5E.js"></script>
 	
 	<script type="text/javascript" src="/assets/erpnext/dist/js/erpnext.bundle.6BKMOHUU.js"></script>
+	<script src="/assets/employee/assets/js/employeeDash.js"></script>
 	
 	
 	
 	<script>frappe.csrf_token="{{frappe.session.csrf_token}}";</script>
-	<script src="/assets/employee/assets/js/employeeDash.js"></script>
+	
 </body>
 </body>
 </html>

@@ -4,12 +4,9 @@ from frappe.utils import getdate
 from frappe.utils import get_datetime
 from datetime import datetime
 from .permission_check import has_permission
-from frappe.utils import get_site_name
+from frappe.utils import get_site_name , get_site_base_path
 
 
-VALID_RANGE_Longitude = 0.007
-
-VALID_RANGE_Latitude= 0.017
 
 #if the location of user is <= VALID_RANGE_Longitude
 
@@ -28,6 +25,7 @@ email = frappe.db.get_value('User', {'username': uid}, ['email'])
 employee = frappe.db.get_value('Employee', {'user_id': uid}, ['employee'])
 
 company = frappe.db.get_value('Employee', {'user_id': uid}, ['company'])
+print("This is the company line 31 in api.py",company)
 if(not company):
     company = ""
 location_db_response = frappe.db.get_value('Company', {'company_name': company}, ['location'])
@@ -36,6 +34,15 @@ NOT_IN_RANGE = "Not In Range!Get closer to the company : "+ company
 
 @frappe.whitelist()
 def check_location_and_fill_attendance(**args):
+    
+   
+    
+    doctype_name  = "Custom fields"
+
+    
+    VALID_RANGE_Longitude = float(frappe.db.get_value(doctype_name,{'for_custom_app_name': 'Employee_custom_fields'}, ['longitude_difference'])) or 0.007
+    VALID_RANGE_Latitude = float(frappe.db.get_value(doctype_name,{'for_custom_app_name': 'Employee_custom_fields'}, ['latitude_difference'])) or  0.017
+    print(" location database responte  in api line 39",location_db_response)
     location = eval(location_db_response)
     coordinates = location['features'][0]['geometry']['coordinates']
     print(coordinates)
@@ -49,7 +56,7 @@ def check_location_and_fill_attendance(**args):
         return fill_attendance_function(status)
     else:
         return NOT_IN_RANGE
-    
+
 @frappe.whitelist()
 def checkAttendanceFilled():
     now = datetime.now()
@@ -199,6 +206,10 @@ def punchAttendance():
 def fill_attendance(**args):
     status = args.get('status')
     return fill_attendance_function(status)
+
+@frappe.whitelist()
+def logout(**args):
+    frappe.local.login_manager.logout(user=uid)
     
    
    
@@ -276,7 +287,9 @@ def fill_attendance_function(status):
 
 @frappe.whitelist(allow_guest = True)
 def check_permission():
-    site_name = get_site_name(frappe.local.request.host)    
+    site_name = get_site_name(frappe.local.request.host) 
+   # site_name =  get_site_base_path()
+    
     user= frappe.session.user
     print("site name: ***********************************************************************************")  
     print(site_name)
@@ -284,13 +297,15 @@ def check_permission():
     print(user == "Guest")
     if(user == "Guest"):
         relocate = True
-        relocation_url = "https://"+site_name+"/employee_dashboard/login.html"
+        relocation_url = "/employee_dashboard/login.html"
     else:
         permission = has_permission("Attendance",raise_exception= False)
+        
+        
         if(not permission):
             permission = has_permission("Attendance",raise_exception= False)
             relocate = True
-            relocation_url = "https://"+site_name+"/employee_dashboard/chart.html"
+            relocation_url = "/employee_dashboard/Error/Error-403"
         else:
             relocate = False
             relocation_url = None
