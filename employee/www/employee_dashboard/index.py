@@ -13,7 +13,6 @@ datetimeNow = now.strftime("%Y-%m-%d %H:%M :%s")
 
 def makeJson(data):
         json_object = json.dumps(data)
-        print("(&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
         print(json_object)
         return json_object                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 
@@ -35,6 +34,7 @@ def get_context(context):
           
             attenance_db_request = frappe.db.sql(""" SELECT status,  DATE_FORMAT(attendance_date, '%m-%d-%Y') FROM `tabAttendance` WHERE (employee_name='Natnael Lemma')""", as_dict=0)
             context.attendane_data = makeJson(attenance_db_request)
+            
             ##############################data fetch for analysis############################
             uid= frappe.session.user    
             email = frappe.db.get_value('User', {'username': uid}, ['email'])
@@ -70,21 +70,15 @@ def get_context(context):
             for item in attendance_first:        # to unpack the array value from database 
                 attendance_name = item
 
-            
-
-           
-
             if(last_punch):
-                print("I am in ==context lastpunch 1")
-                print(attendance_name)
+
                 doc = frappe.get_doc('Attendance',attendance_name)
                 context.punch_in = doc.in_time
                 #context.morning_punch_out = doc.out_time_morning
                 #context.afternoon_punch_in = doc.in_time_afternoon
                 context.punch_out = doc.out_time
             
-                print("this is morning punch in ")
-                print( context.punch_in)
+               
 
                 context.Break = ""
                 try:
@@ -95,12 +89,6 @@ def get_context(context):
                         context.total_work_time = context.datetime - (context.punch_in)
                 except:
                     context.total_work_time = 0
-                    
-
-            print (" @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@hello this is datetime now")
-            print (datetimeNow)
-                
-
             ##############################data fetch for analysis############################
                 
         return context
