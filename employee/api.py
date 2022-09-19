@@ -20,12 +20,10 @@ date = frappe.utils.getdate()
 
 
 uid= frappe.session.user
-print(uid)
 email = frappe.db.get_value('User', {'username': uid}, ['email'])
 employee = frappe.db.get_value('Employee', {'user_id': uid}, ['employee'])
-
 company = frappe.db.get_value('Employee', {'user_id': uid}, ['company'])
-print("This is the company line 31 in api.py",company)
+
 if(not company):
     company = ""
 location_db_response = frappe.db.get_value('Company', {'company_name': company}, ['location'])
@@ -34,23 +32,13 @@ NOT_IN_RANGE = "Not In Range!Get closer to the company : "+ company
 
 @frappe.whitelist()
 def check_location_and_fill_attendance(**args):
-    
-   
-    
     doctype_name  = "Custom fields"
-
-    
     VALID_RANGE_Longitude = float(frappe.db.get_value(doctype_name,{'for_custom_app_name': 'Employee_custom_fields'}, ['longitude_difference'])) or 0.007
     VALID_RANGE_Latitude = float(frappe.db.get_value(doctype_name,{'for_custom_app_name': 'Employee_custom_fields'}, ['latitude_difference'])) or  0.017
-    print(" location database responte  in api line 39",location_db_response)
     location = eval(location_db_response)
     coordinates = location['features'][0]['geometry']['coordinates']
-    print(coordinates)
-    print(args.get('longitude'))
     difference = abs(float(coordinates[1]) - float(args.get('latitude')))
-    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",difference)
     result = abs(float(coordinates[1]) - float(args.get('latitude'))) <= VALID_RANGE_Longitude 
-    print ("result &&&&&&&&&&&&&&&&&&&&&&", result)
     if(abs(float(coordinates[0]) - float(args.get('longitude'))) <= VALID_RANGE_Longitude and abs(float(coordinates[1]) - float(args.get('latitude'))) <= VALID_RANGE_Latitude):
         status = args.get('status')
         return fill_attendance_function(status)
@@ -62,7 +50,6 @@ def checkAttendanceFilled():
     now = datetime.now()
     datetm = now.strftime("%Y-%m-%d %H:%M:%S")
     date = frappe.utils.getdate()
-    print("I am in the check")
     date = frappe.utils.getdate()
     
 
@@ -106,9 +93,6 @@ def punchAttendance():
     now = datetime.now()
     datetm = now.strftime("%Y-%m-%d %H:%M:%S")
     date = frappe.utils.getdate()
-
-    print("Below is the correct datetime value printed from the Employee.API.api.py")
-    print(datetm)
     uid= frappe.session.user    
     email = frappe.db.get_value('User', {'username': uid}, ['email'])
     employee = frappe.db.get_value('Employee', {'user_id': uid}, ['employee'])
@@ -140,38 +124,29 @@ def punchAttendance():
 
     for item in attendance_first:              # to unpack the array value from database 
         attendance_name = item
-    print("last punch in punch attendance")
-    print(last_punch)
+   
     
     if(last_punch == "1"):
-        print("I am in ==1")
-
         doc = frappe.get_doc('Attendance',attendance_name)
         
         doc.out_time = datetm
         doc.last_punch = 2
         doc.save()
         return "punched Out at time " + datetm
-
-
-
     elif(last_punch == "2"):
         return "Punch for the day already satisfied!!!"
     elif(last_punch == "A"):
         return "You are Absent today can't Punch!!!"
     elif(last_punch == "W"):
         doc = frappe.get_doc('Attendance',attendance_name)
-        
         doc.out_time = datetm
         doc.last_punch = 2
         doc.save()
-        return "punched Out at time " + datetm
-       
+        return "punched Out at time " + datetm    
     else:
         return "Please fill todays attendance first."
     '''
         if(last_punch == 1):
-        print("I am in ==1")
 
         doc = frappe.get_doc('Attendance',attendance_name)
         
@@ -206,11 +181,6 @@ def punchAttendance():
 def fill_attendance(**args):
     status = args.get('status')
     return fill_attendance_function(status)
-
-@frappe.whitelist()
-def logout(**args):
-    frappe.local.login_manager.logout(user=uid)
-    
    
    
 def fill_attendance_function(status):
@@ -234,14 +204,11 @@ def fill_attendance_function(status):
                     'status':status,
                     'in_time': datetm,
                     'last_punch':1,
-                
-        
                 })
                 doc.insert()
-                print("i am here in === status present")
                 doc.save()
                 frappe.db.commit()
-                print(doc.name)
+               
             elif (status == "Absent"):
                 # create a new document
                 doc = frappe.get_doc({
@@ -251,14 +218,11 @@ def fill_attendance_function(status):
                     'company': company,
                     'status':status,
                     'last_punch': "A",
-                
-        
                 })
                 doc.insert()
-                print("i am here in === status present")
                 doc.save()
                 frappe.db.commit()
-                print(doc.name)
+                
             elif (status == "Work From Home"):
                 # create a new document
                 doc = frappe.get_doc({
@@ -273,11 +237,10 @@ def fill_attendance_function(status):
         
                 })
                 doc.insert()
-                print("i am here in === status present")
+             
                 doc.save()
                 frappe.db.commit()
-                print(doc.name)
-                
+
             else: 
                 return "Invalid Attendance"   
             return "New attendance created!"
@@ -291,17 +254,11 @@ def check_permission():
    # site_name =  get_site_base_path()
     
     user= frappe.session.user
-    print("site name: ***********************************************************************************")  
-    print(site_name)
-    print("user: ***********************************************************************************")  
-    print(user == "Guest")
     if(user == "Guest"):
         relocate = True
         relocation_url = "/employee_dashboard/login.html"
     else:
         permission = has_permission("Attendance",raise_exception= False)
-        
-        
         if(not permission):
             permission = has_permission("Attendance",raise_exception= False)
             relocate = True
