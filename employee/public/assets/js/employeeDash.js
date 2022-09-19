@@ -5,27 +5,7 @@
 
 
 
-	function check_permission(){
-		let makecall = async()=>{
-			// post to API
-			
-				res = await $.ajax({
-					url: '/api/method/employee.api.check_permission',
-					method: 'POST',
-					headers: {
-						'X-Frappe-CSRF-Token': frappe.csrf_token
-					},
-				});
-				var response = res.message
-				
-				if (response["relocate"]){
-					
-					window.location.href = response["relocation_url"];	
-				}
-			}	
-		makecall();
-	}
-	check_permission();
+	
 	function fill_attendance(value){
 		var myObj={status:value};
 
